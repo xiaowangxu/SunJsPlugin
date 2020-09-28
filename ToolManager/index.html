@@ -1,0 +1,102 @@
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ToolManager</title>
+</head>
+
+<body>
+	<div id="button" style="width: 100px; height: 100px; background-color: black;" onclick="clickobj()"
+		ondrag="rightclick()" onmousemove="mousemove()" draggable="true"></div>
+	<a id="log"></a>
+</body>
+
+<script type="module">
+	import * as ToolManager from "./ToolManager.js"
+
+	let Manager = new ToolManager.ToolManager((type, msg) => { console.log(type + "\n" + msg) })
+
+	let ToolA = new ToolManager.MicroTool("A", "初始工具", "初始化用")
+	ToolA.autorun = function (manager, globalparam, lasttoolparam) {
+		console.log("%cA%c AutoRunning", "background-color: blue; color: white; border-radius: 4px; padding: 0px 4px;", "")
+		return { flag: "ALL", param: { num: lasttoolparam.num + "A" } }
+	}
+
+	let ToolSet = new ToolManager.MicroTool("Set", "设置颜色工具", "设置方块颜色")
+	ToolSet.autorun = function (manager, globalparam, lasttoolparam) {
+		console.log("%cSet%c AutoRunning 设置方块颜色为 " + lasttoolparam.color, "background-color: blue; color: white; border-radius: 4px; padding: 0px 4px;", "")
+		document.getElementById('button').style.backgroundColor = lasttoolparam.color
+		return { flag: "ALL", param: {} }
+	}
+
+	let ToolB = new ToolManager.MicroTool("B", "点击工具", "请点击黑色方块", () => { return { test: 1 } })
+	ToolB.autorun = function (manager, globalparam, lasttoolparam) {
+		this.data.test = "hello ToolB"
+		console.log("%cB%c AutoRunning 设置工具的data.test为hello ToolB", "background-color: blue; color: white; border-radius: 4px; padding: 0px 4px;", "")
+		manager.send_Param({ num: lasttoolparam.num + ">>" })
+		return null
+	}
+	ToolB.click = function (manager, globalparam, eventparam, lasttoolparam) {
+		console.log("B Click 设置文本为工具的data.test\t" + this.data.test)
+		document.getElementById("log").innerHTML = this.data.test
+		return { flag: "CLICK", param: { num: lasttoolparam.num + "B" } }
+	}
+	ToolB.mousemove = function (manager, globalparam, eventparam, lasttoolparam) {
+		manager.emit("mousemove", { pos: eventparam })
+		return null
+	}
+	ToolB.rightclick = function (manager, globalparam, eventparam, lasttoolparam) {
+		return { flag: "DRAG", param: {} }
+	}
+
+	let ToolSendData = new ToolManager.MicroTool("SendData", "获得最后参数", "常用作工具链输出")
+	ToolSendData.autorun = function (manager, globalparam, lasttoolparam) {
+		console.log("%cSendData%c AutoRunning 返回结果", "background-color: blue; color: white; border-radius: 4px; padding: 0px 4px;", "")
+		manager.emit("dataout", { global: globalparam, param: lasttoolparam })
+		return { flag: "ALL", param: {} }
+	}
+
+	Manager.add_MicroTool(ToolA)
+	Manager.add_MicroTool(ToolB)
+	Manager.add_MicroTool(ToolSendData)
+	Manager.add_MicroTool(ToolSet)
+
+	window.clickobj = () => {
+		Manager.call("click", event.clientX + "," + event.clientY)
+	}
+
+	window.mousemove = () => {
+		Manager.call("mousemove", event.clientX + "," + event.clientY)
+	}
+
+	window.rightclick = () => {
+		Manager.call("rightclick")
+	}
+
+	function getColor() {
+		return "red"
+	}
+
+	let graph = new ToolManager.FlowGraph("A-B|B-CLICK-setColor-Set|B-DRAG-setColor2-Set|Set-SendData", "A", {
+		setColor: (global, param) => {
+			return { color: global.hightlightcolor }
+		},
+		setColor2: (global, param) => {
+			return { color: getColor() }
+		}
+	}, {
+		B_mousemove: (global, param) => {
+			document.getElementById("log").innerHTML = param.pos + ' ' + global.hightlightcolor
+		},
+		SendData_dataout: (global, param) => {
+			console.log("最终结果是:", param)
+		}
+	})
+
+	// console.log(graph)
+
+	Manager.run(graph, {}, { hightlightcolor: 'green' })
+</script>
+
+</html>
