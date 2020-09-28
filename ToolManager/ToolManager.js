@@ -5,7 +5,6 @@ export class ToolManager {
 		this.global_data = {}
 		this.last_param = {}
 		this.graph = null
-		this.transforms = {}
 		this.log_func = log
 	}
 
@@ -66,7 +65,6 @@ export class ToolManager {
 				if (result.flag === "ERROR") {
 					this.current_tool = null
 					this.global_data = {}
-					this.transforms = {}
 					this.signals = {}
 					this.graph = null
 					this.log_func('error', result.param.errorMsg)
@@ -75,7 +73,6 @@ export class ToolManager {
 				else if (result.flag === "END") {
 					this.current_tool = null
 					this.global_data = {}
-					this.transforms = {}
 					this.signals = {}
 					this.graph = null
 					// comment
@@ -108,7 +105,6 @@ export class ToolManager {
 			if (result.flag === "ERROR") {
 				this.current_tool = null
 				this.global_data = {}
-				this.transforms = {}
 				this.signals = {}
 				this.graph = null
 				this.log_func('error', result.param.errorMsg)
@@ -117,7 +113,6 @@ export class ToolManager {
 			else if (result.flag === "END") {
 				this.current_tool = null
 				this.global_data = {}
-				this.transforms = {}
 				this.signals = {}
 				this.graph = null
 				// comment
@@ -128,7 +123,6 @@ export class ToolManager {
 			if (this.graph.current_node === null) {
 				this.current_tool = null
 				this.global_data = {}
-				this.transforms = {}
 				this.signals = {}
 				this.graph = null
 				// comment
