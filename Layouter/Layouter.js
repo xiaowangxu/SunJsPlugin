@@ -328,11 +328,16 @@ export class Panel {
 	}
 
 	set_Style(expand_x = true, expand_y = true, min_width = 100, min_height = 100, visible = true) {
-		this.min_width = min_width
-		this.min_height = min_height
-		this.expand_x = expand_x
-		this.expand_y = expand_y
-		this.visible = visible
+		if (min_width !== null)
+			this.min_width = min_width
+		if (min_height !== null)
+			this.min_height = min_height
+		if (expand_x !== null)
+			this.expand_x = expand_x
+		if (expand_y !== null)
+			this.expand_y = expand_y
+		if (visible !== null)
+			this.visible = visible
 	}
 
 	is_ControlPanel() {
@@ -389,48 +394,51 @@ export class Panel {
 			this.children[i].format()
 		}
 
-		if (!this.is_ControlPanel()) {
+
+		if (this.is_ControlPanel()) {
+
+			this.children = this.children.filter((item) => {
+				if (item.is_ControlPanel() && item.children.length === 0) {
+					return false
+				}
+				return true
+			})
+			// console.log(this.get_Info(0), this.children)
+
+			if (this.children.length === 0) {
+				return
+			}
+
+			if (this.children.length === 1) {
+				this.switch_Callback()
+				let child = this.children[0]
+				this.direction = child.direction
+				this.panel_id = child.panel_id
+				this.name = child.name
+				this.on_resize = child.on_resize
+				this.expand_x = child.expand_x
+				this.expand_y = child.expand_y
+				this.min_width = child.min_width
+				this.min_height = child.min_height
+				this.children = child.children
+				this.visible = child.visible
+				this.switch_created_callback = child.switch_created_callback
+				this.control_switch = child.control_switch
+				this.current_panelname = child.current_panelname
+				// this.current_panelname = ''
+				return
+			}
+
+			if (this.control_switch) {
+				this.switch_Callback()
+			}
+		}
+		else {
 			if (this.switch_created_callback !== null) {
 				// console.log(child)
-				this.switch_created_callback([{ name: this.name, panelid: this.panel_id }])
+				this.switch_created_callback([{ name: this.name, panelid: this.panel_id }], this.min_width, this.min_height)
 			}
 			return
-		}
-
-		this.children = this.children.filter((item) => {
-			if (item.is_ControlPanel() && item.children.length === 0) {
-				return false
-			}
-			return true
-		})
-		// console.log(this.get_Info(0), this.children)
-
-		if (this.children.length === 0) {
-			return
-		}
-
-		if (this.children.length === 1) {
-			this.switch_Callback()
-			let child = this.children[0]
-			this.direction = child.direction
-			this.panel_id = child.panel_id
-			this.name = child.name
-			this.on_resize = child.on_resize
-			this.expand_x = child.expand_x
-			this.expand_y = child.expand_y
-			this.min_width = child.min_width
-			this.min_height = child.min_height
-			this.children = child.children
-			this.visible = child.visible
-			this.switch_created_callback = child.switch_created_callback
-			this.control_switch = child.control_switch
-			this.current_panelname = child.current_panelname
-			// this.current_panelname = ''
-			return
-		}
-
-		if (this.control_switch) {
-			this.switch_Callback()
 		}
 
 		/* let i = 0
@@ -684,9 +692,15 @@ export class Panel {
 			this.children.forEach((panel) => {
 				// console.log(panel)
 				if (panel.switch_created_callback !== null && !panel.is_ControlPanel())
-					panel.switch_created_callback(array)
+					panel.switch_created_callback(array, panel.min_width, panel.min_height)
 			})
 		}
+	}
+
+	set_Size(width = null, height = null) {
+		if (this.is_ControlPanel()) return
+		if (width !== null) this.min_width = parseFloat(width)
+		if (height !== null) this.min_height = parseFloat(height)
 	}
 
 	get_Info(layer = 0) {
