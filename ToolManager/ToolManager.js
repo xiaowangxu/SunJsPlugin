@@ -1,11 +1,12 @@
 export class ToolManager {
-	constructor(log) {
+	constructor(log = () => { }, fin = () => { }) {
 		this.micro_tools = new Array()
 		this.current_tool = null
 		this.global_data = {}
 		this.last_param = {}
 		this.graph = null
 		this.log_func = log
+		this.fin_func = fin
 	}
 
 	add_MicroTool(microtool) {
@@ -68,6 +69,7 @@ export class ToolManager {
 					this.signals = {}
 					this.graph = null
 					this.log_func('error', result.param.errorMsg)
+					this.fin_func()
 					return
 				}
 				else if (result.flag === "END") {
@@ -75,6 +77,7 @@ export class ToolManager {
 					this.global_data = {}
 					this.signals = {}
 					this.graph = null
+					this.fin_func()
 					// comment
 					// console.log("Graph Ended")
 					return
@@ -108,6 +111,7 @@ export class ToolManager {
 				this.signals = {}
 				this.graph = null
 				this.log_func('error', result.param.errorMsg)
+				this.fin_func()
 				return
 			}
 			else if (result.flag === "END") {
@@ -115,6 +119,7 @@ export class ToolManager {
 				this.global_data = {}
 				this.signals = {}
 				this.graph = null
+				this.fin_func()
 				// comment
 				// console.log("Graph Ended 1")
 				return
@@ -125,6 +130,7 @@ export class ToolManager {
 				this.global_data = {}
 				this.signals = {}
 				this.graph = null
+				this.fin_func()
 				// comment
 				// console.log("Graph Ended 1")
 				return
@@ -136,18 +142,6 @@ export class ToolManager {
 			}
 			result = this.turnTo(this.graph.current_node.name, result.param)
 		}
-		// if (this.graph.current_node.no_Next()) {
-		// 	this.current_tool = null
-		// 	this.global_data = {}
-		// 	this.transforms = {}
-		// 	this.graph = null
-		// 	this.signals = {}
-		// 	// comment
-		// 	// console.log("Graph Ended 2")
-		// 	return
-		// }
-		// comment
-		// console.log("Autorun Finished, Current State = " + this.current_tool.name)
 	}
 }
 

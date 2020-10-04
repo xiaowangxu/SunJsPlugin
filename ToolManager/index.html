@@ -15,7 +15,7 @@
 <script type="module">
 	import * as ToolManager from "./ToolManager.js"
 
-	let Manager = new ToolManager.ToolManager((type, msg) => { console.log(type + "\n" + msg) })
+	let Manager = new ToolManager.ToolManager((type, msg) => { console.log(type + "\n" + msg) }, () => { console.log(">> finished") })
 
 	let ToolA = new ToolManager.MicroTool("A", "初始工具", "初始化用")
 	ToolA.autorun = function (manager, globalparam, lasttoolparam) {
