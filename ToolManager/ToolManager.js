@@ -101,7 +101,12 @@ export class ToolManager {
 		this.graph = graph
 		this.global_data = global
 		if (this.graph.current_node === null) {
-			throw new Error("State is null")
+			this.current_tool = null
+			this.global_data = {}
+			this.signals = {}
+			this.graph = null
+			this.fin_func()
+			return
 		}
 		let result = this.turnTo(this.graph.current_node.name, param)
 		while (result !== null) {
@@ -120,8 +125,6 @@ export class ToolManager {
 				this.signals = {}
 				this.graph = null
 				this.fin_func()
-				// comment
-				// console.log("Graph Ended 1")
 				return
 			}
 			let transform = this.graph.advance(result.flag)
