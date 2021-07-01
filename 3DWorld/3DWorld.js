@@ -27,6 +27,10 @@ export const PlaneType = {
 	'XZ+Y': 'XZ+Y',
 }
 
+export function ROUND(number, precision) {
+	return Math.round(number / precision) * precision
+}
+
 export class Angle {
 	constructor(angle, type = AngleType.DEG) {
 		this.angle = angle;
@@ -40,23 +44,27 @@ export class Angle {
 		},
 		RAD: (a) => {
 			a.angle = a.angle / Math.PI * 180
+			a.type = 'DEG'
 			return a
 		},
 		XPI: (a) => {
 			a.angle = a.angle * 180
+			a.type = 'DEG'
 			return a
 		}
 	}
 	static convert_from_DEG = {
-		DEF: (a) => {
+		DEG: (a) => {
 			return a
 		},
 		RAD: (a) => {
 			a.angle = a.angle / 180 * Math.PI
+			a.type = 'RAD'
 			return a
 		},
 		XPI: (a) => {
 			a.angle = a.angle / 180
+			a.type = 'XPI'
 			return a
 		}
 	}
@@ -79,7 +87,7 @@ export class Angle {
 
 	to(type) {
 		let origin = this.clone();
-		return Angle.convert_from_DEG[type](Angle.convert_to_DEG[origin.type](origin)).round();
+		return (Angle.convert_from_DEG[type](Angle.convert_to_DEG[origin.type](origin))).round();
 	}
 
 	toNumber(type) {
@@ -118,6 +126,11 @@ export class Angle {
 		let z = position.z;
 		return new Angle(Math.atan2(-z, x), 'RAD');
 	}
+
+	toNumber(round) {
+		if (round !== undefined) return ROUND(this.angle, round);
+		return this.angle;
+	}
 }
 
 export class Position {
@@ -133,7 +146,7 @@ export class Position {
 			return p
 		},
 		HSL: (p) => {
-			let angle = new Angle(p.x, 'RAD');
+			let angle = p.x;
 			let xzpos = angle.toPosition().mult(p.y);
 			xzpos.type = 'XYZ';
 			xzpos.y = p.z;
@@ -145,7 +158,7 @@ export class Position {
 			return p
 		},
 		HSL: (p) => {
-			let angle = Angle.fromPosition(p).angle;
+			let angle = Angle.fromPosition(p);
 			let dis = Math.hypot(p.x, p.z);
 			p.x = angle;
 			p.z = p.y;
@@ -171,12 +184,25 @@ export class Position {
 		origin.z *= num;
 		return origin.to(this.type);
 	}
+
+	toObject(round) {
+		switch (this.type) {
+			case 'XYZ':
+				return {
+					x: round === undefined ? this.x : ROUND(this.x, round),
+					y: round === undefined ? this.y : ROUND(this.y, round),
+					z: round === undefined ? this.z : ROUND(this.z, round),
+				}
+			case 'HSL':
+				return {
+					angle: this.x.to('DEG').toNumber(round),
+					radius: round === undefined ? this.y : ROUND(this.y, round),
+					height: round === undefined ? this.z : ROUND(this.z, round),
+				}
+		}
+	}
 }
 
-for (let i = -1000; i <= 1000; i += 10) {
-	let angle = new Angle(i)
-	console.log(angle.angle, angle.toPosition(PlaneType["XY-Z"]))
-}
-
-let a = new Position(0, 10, -10, PositionType.XYZ)
-console.log(a, a.to(PositionType.HSL), a.to(PositionType.HSL).to('XYZ'))
+let angle = new Angle(45)
+let a = (new Position(angle, 80, 100, 'HSL')).to('XYZ')
+console.log(a.toObject(0.0001))
