@@ -1,0 +1,69 @@
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+</head>
+
+<body>
+	<button onclick="do_()">do</button>
+	<button onclick="undo_()">undo</button>
+	<button onclick="redo_()">redo</button>
+</body>
+<script type="module">
+	import { History } from './History.js'
+	import { Action } from './Action.js'
+
+	let editor = {
+		arr: [],
+		print(str) {
+			console.log(str);
+		}
+	};
+
+	class PushAction extends Action {
+		constructor(obj) {
+			super();
+			this.name = 'Push Action';
+			this.obj = obj;
+		}
+
+		execute(editor) {
+			editor.arr.push(this.obj);
+		}
+
+		undo(editor) {
+			editor.arr.pop();
+		}
+
+		redo(editor) {
+			editor.arr.push(this.obj);
+		}
+
+		dispose(editor) {
+		}
+	}
+
+	let history = new History(editor, (type, title, info) => {
+		console.log(type, title, info, editor.arr)
+	})
+
+	let id = 0;
+
+	window.do_ = function () {
+		let a = new PushAction(id++);
+		history.execute(a);
+	}
+
+	window.undo_ = function () {
+		history.undo();
+	}
+
+	window.redo_ = function () {
+		history.redo();
+	}
+</script>
+
+</html>
