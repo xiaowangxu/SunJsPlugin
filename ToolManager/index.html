@@ -37,16 +37,16 @@
 		manager.send_Param({ num: lasttoolparam.num + ">>" })
 		return null
 	}
-	ToolB.click = function (manager, globalparam, eventparam, lasttoolparam) {
+	ToolB.click = function (manager, globalparam, lasttoolparam, eventparam) {
 		console.log("B Click 设置文本为工具的data.test\t" + this.data.test)
 		document.getElementById("log").innerHTML = this.data.test
 		return { flag: "CLICK", param: { num: lasttoolparam.num + "B" } }
 	}
-	ToolB.mousemove = function (manager, globalparam, eventparam, lasttoolparam) {
+	ToolB.mousemove = function (manager, globalparam, lasttoolparam, eventparam) {
 		manager.emit("mousemove", { pos: eventparam })
 		return null
 	}
-	ToolB.rightclick = function (manager, globalparam, eventparam, lasttoolparam) {
+	ToolB.rightclick = function (manager, globalparam, lasttoolparam, eventparam) {
 		return { flag: "DRAG", param: {} }
 	}
 
