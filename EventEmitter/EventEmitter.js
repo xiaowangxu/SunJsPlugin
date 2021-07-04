@@ -10,10 +10,20 @@ class EventEmitter {
 		});
 	}
 
-	bind(callback) {
+	bind(callback, opt = { once: false }) {
 		let sym = Symbol();
 		this.events[sym] = callback;
+		if (opt.once !== undefined && opt.once) {
+			this.events[sym] = (...data) => {
+				callback(...data);
+				this.unbind(sym);
+			}
+		}
 		return sym;
+	}
+
+	once(callback) {
+		return this.bind(callback, { once: true })
 	}
 
 	off() {

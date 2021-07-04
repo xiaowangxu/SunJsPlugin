@@ -13,6 +13,20 @@
 </body>
 <script type="module">
 	import EE from './EventEmitter.js'
+
+	let changeEvent = new EE('change_event')
+
+	let a = changeEvent.bind((event) => {
+		console.log(">>>> changed A !!!", event)
+	})
+
+	let b = changeEvent.bind((event) => {
+		console.log(">>>> changed B !!!", event)
+	})
+
+	window.addEventListener('click', () => {
+		changeEvent.trigger(event)
+	})
 </script>
 
 </html>
