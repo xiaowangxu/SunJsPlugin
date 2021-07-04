@@ -18,8 +18,9 @@
 	let Manager = new ToolManager.ToolManager((type, msg) => { console.log(type + "\n" + msg) }, () => { console.log(">> finished") })
 
 	let ToolA = new ToolManager.MicroTool("A", "初始工具", "初始化用")
-	ToolA.autorun = function (manager, globalparam, lasttoolparam) {
-		console.log("%cA%c AutoRunning", "background-color: blue; color: white; border-radius: 4px; padding: 0px 4px;", "")
+	ToolA.autorun = function (manager, globalparam, lasttoolparam, callevent, nodeparam) {
+		// console.log(manager, globalparam, lasttoolparam, nodeparam)
+		console.trace("%cA%c AutoRunning " + nodeparam[0], "background-color: blue; color: white; border-radius: 4px; padding: 0px 4px;", "")
 		return { flag: "ALL", param: { num: lasttoolparam.num + "A" } }
 	}
 
@@ -34,7 +35,7 @@
 	ToolB.autorun = function (manager, globalparam, lasttoolparam) {
 		this.data.test = "hello ToolB"
 		console.log("%cB%c AutoRunning 设置工具的data.test为hello ToolB", "background-color: blue; color: white; border-radius: 4px; padding: 0px 4px;", "")
-		manager.send_Param({ num: lasttoolparam.num + ">>" })
+		// manager.last_param = ({ num: lasttoolparam.num + ">>" })
 		return null
 	}
 	ToolB.click = function (manager, globalparam, lasttoolparam, eventparam) {
@@ -78,7 +79,7 @@
 		return "red"
 	}
 
-	let graph = new ToolManager.FlowGraph("A-B|B-CLICK-setColor-Set|B-DRAG-setColor2-Set|Set-SendData", "A", {
+	let graph = new ToolManager.FlowGraph("A#1:1-A#2:2|A#2-A#3:3", "A#1", {
 		setColor: (global, param) => {
 			return { color: global.hightlightcolor }
 		},
@@ -94,9 +95,9 @@
 		}
 	})
 
-	// console.log(graph)
+	console.log(graph)
 
-	Manager.run(graph, {}, { hightlightcolor: 'green' })
+	Manager.run(graph, {}, { hightlightcolor: 'blue' })
 </script>
 
 </html>
