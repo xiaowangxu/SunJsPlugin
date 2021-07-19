@@ -1,3 +1,63 @@
+class BoxAlignHelper extends THREE.Object3D {
+	constructor(object) {
+		super()
+		this.box = new THREE.Box3();
+		this.dashMaterial = new THREE.LineDashedMaterial({
+			color: 'yellow',
+			linewidth: 2,
+			dashSize: 10,
+			gapSize: 10
+		})
+		this.soildMaterial = new THREE.LineBasicMaterial({
+			color: '#00ff00',
+			linewidth: 2,
+		})
+		if (object) {
+			this.box.setFromObject(object);
+		}
+		const points = [];
+		points.push(new THREE.Vector3(0, 0, 0));
+		points.push(new THREE.Vector3(0, 1, 0));
+
+		this.geometry = new THREE.BufferGeometry().setFromPoints(points);
+		this.centerLineV = new THREE.Line(this.geometry, this.dashMaterial);
+		this.centerLineV2 = new THREE.Line(this.geometry, this.soildMaterial);
+		this.add(this.centerLineV)
+		this.add(this.centerLineV2)
+		this.centerLineV.position.y = 20;
+		this.centerLineV.scale.y = 10;
+		this.centerLineV2.scale.y = 20;
+
+		const node = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+		node.setAttribute('stroke', 'white');
+		// node.setAttribute('stroke-wdith', '2');
+		node.setAttribute('fill', 'red');
+		node.setAttribute('x1', '-10');
+		node.setAttribute('y1', '0');
+		node.setAttribute('x2', '10');
+		node.setAttribute('y2', '0');
+		node.style.strokeLinecap = 'round'
+		node.style.strokeWidth = 2
+		this.circle1 = new SVGObject(node.cloneNode())
+		this.circle2 = new SVGObject(node.cloneNode())
+		this.circle3 = new SVGObject(node.cloneNode())
+		this.add(this.circle1)
+		this.add(this.circle2)
+		this.add(this.circle3)
+		this.circle1.position.y = 20
+		this.circle2.position.y = 30
+
+		const node2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+		node2.textContent = ("123")
+		setInterval(() => {
+			node2.textContent += "!"
+		}, 1000)
+		node2.style.textAnchor = 'middle'
+		this.circle4 = new SVGObject(node2)
+		this.add(this.circle4)
+	}
+}
+
 <div class="itemview-dark"
 	style="max-height: 800px; padding: 0px; height: fit-content; flex-shrink: 0; user-select: auto; border: var(--ObjectBGColor) 6px solid;">
 	<div style="width: 100%; height: 100%; border-radius: var(--ObjectRadius); overflow: auto;">
